@@ -76,6 +76,25 @@ export default function Home() {
       <div className="flex flex-col my-5 px-10 text-center
                       lg:px-20 lg:text-left
                       2xl:px-32">
+
+        <div className="mt-5">
+          <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
+                        lg:text-3xl
+                        2xl:text-4xl">
+            <span className="text-secondary">Software Engineer</span> @ MES Innovation Sdn Bhd
+          </p>
+          <p className="text-unhighlighted text-sm font-[family-name:var(--font-titillium-web-light)]
+                        xl:text-xl">July 2025 - May 2026</p>
+          <ul className="text-lg text-justify leading-relaxed list-disc px-10 my-5 font-[family-name:var(--font-titillium-web-regular)]
+                         md:text-xl
+                         xl:text-2xl
+                         2xl:leading-9">
+            <li>Debug and resolve software issues in a fast-paced development environment.</li>
+            <li>Implement new features and improvements to existing software applications.</li>
+            <li>Manages CI/CD pipelines for automated testing and deployment.</li>
+          </ul>
+        </div>
+
         <div className="mt-5">
           <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
                         lg:text-3xl
