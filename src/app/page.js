@@ -1,12 +1,80 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TbCircleArrowUpRight } from "react-icons/tb";
-import { FaRegPaperPlane, FaGithub, FaStackOverflow  } from "react-icons/fa";
+import { FaRegPaperPlane, FaGithub, FaStackOverflow } from "react-icons/fa";
 import { CiLinkedin } from "react-icons/ci";
-import { RiFlutterFill } from "react-icons/ri";
-import { SiHuggingface, SiPython, SiFirebase, SiGooglemaps } from "react-icons/si";
+import { client } from "@/sanity/client";
+import { urlFor } from "@/sanity/image";
+import {
+  EXPERIENCES_QUERY,
+  PROFILE_QUERY,
+  PROJECTS_QUERY,
+  SKILL_CATEGORIES_QUERY,
+} from "@/sanity/queries";
+import {
+  techIconMap,
+  fallbackExperiences,
+  fallbackProjects,
+  fallbackSkillCategories,
+} from "@/constants";
 
-export default function Home() {
+async function getExperiences() {
+  try {
+    const data = await client.fetch(EXPERIENCES_QUERY, {}, { next: { revalidate: 60 } });
+    return data && data.length > 0 ? data : fallbackExperiences;
+  } catch (error) {
+    console.error("Failed to fetch experiences from Sanity:", error);
+    return fallbackExperiences;
+  }
+}
+
+async function getProfile() {
+  try {
+    return await client.fetch(PROFILE_QUERY, {}, { next: { revalidate: 60 } });
+  } catch (error) {
+    console.error("Failed to fetch profile from Sanity:", error);
+    return null;
+  }
+}
+
+async function getProjects() {
+  try {
+    const data = await client.fetch(PROJECTS_QUERY, {}, { next: { revalidate: 60 } });
+    return data && data.length > 0 ? data : fallbackProjects;
+  } catch (error) {
+    console.error("Failed to fetch projects from Sanity:", error);
+    return fallbackProjects;
+  }
+}
+
+async function getSkillCategories() {
+  try {
+    const data = await client.fetch(SKILL_CATEGORIES_QUERY, {}, { next: { revalidate: 60 } });
+    return data && data.length > 0 ? data : fallbackSkillCategories;
+  } catch (error) {
+    console.error("Failed to fetch skill categories from Sanity:", error);
+    return fallbackSkillCategories;
+  }
+}
+
+export default async function Home() {
+  const [experiences, profile, projects, skillCategories] = await Promise.all([
+    getExperiences(),
+    getProfile(),
+    getProjects(),
+    getSkillCategories(),
+  ]);
+
+  const name = profile?.name || "Ritchie";
+  const headline = profile?.headline || "Software Engineer";
+  const location = profile?.location || "based in Penang, Malaysia";
+  const subheading = profile?.subheading || "Major in AI and minor in Mathematics";
+  const email = profile?.email || "ritchiepoh@gmail.com";
+  const linkedin = profile?.socialLinks?.linkedin || "https://www.linkedin.com/in/ritchie-p/";
+  const github = profile?.socialLinks?.github || "https://github.com/RitchieP";
+  const stackoverflow = profile?.socialLinks?.stackoverflow || "https://stackoverflow.com/users/13328625/invalidhop";
+  const avatarUrl = profile?.avatar ? urlFor(profile.avatar).width(600).height(600).url() : "/profile_pic.jpg";
+
   return (
     <div>
       {/* First impression of the home page */}
@@ -20,20 +88,20 @@ export default function Home() {
                         lg:text-5xl
                         xl:text-6xl 
                         2xl:text-7xl">
-            Hi, I'm <span className="text-secondary">Ritchie</span>
+            Hi, I&apos;m <span className="text-secondary">{name}</span>
           </p>
           <p className="my-4 text-4xl font-[family-name:var(--font-titillium-web-bold)]
                         lg:text-5xl
                         xl:text-6xl
                         2xl:text-7xl">
-            Software Engineer
+            {headline}
           </p>
           <p className="text-lg
                         lg:text-2xl
                         xl:text-3xl
                         2xl:text-4xl">
-            based in Penang, Malaysia <br/>
-            Major in AI and minor in Mathematics
+            {location} <br/>
+            {subheading}
           </p>
           <div className="flex flex-row items-center justify-center gap-10
                           md:justify-start md:gap-20
@@ -43,15 +111,15 @@ export default function Home() {
               className="text-sm my-4 p-2 flex flex-row items-center gap-3 bg-secondary rounded-xl text-background font-[family-name:var(--font-titillium-web-semi-bold)]
                          lg:text-lg
                          2xl:text-2xl"
-              href="mailto:ritchiepoh@gmail.com"
+              href={`mailto:${email}`}
               target="_blank"
             >
-              Let's Chat! <FaRegPaperPlane color="white"/> 
+              Let&apos;s Chat! <FaRegPaperPlane color="white"/> 
             </a>
             <div className="grid grid-cols-3 gap-2 md:gap-4">
-              <a href="https://www.linkedin.com/in/ritchie-p/" target="_blank"><CiLinkedin className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
-              <a href="https://github.com/RitchieP" target="_blank"><FaGithub className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
-              <a href="https://stackoverflow.com/users/13328625/invalidhop" target="_blank"><FaStackOverflow className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
+              <a href={linkedin} target="_blank"><CiLinkedin className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
+              <a href={github} target="_blank"><FaGithub className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
+              <a href={stackoverflow} target="_blank"><FaStackOverflow className="h-6 w-6 md:h-9 md:w-9 lg:w-10 lg:h-10 2xl:w-12 2xl:h-12"/></a>
             </div>
           </div>
         </div>
@@ -60,8 +128,8 @@ export default function Home() {
         <div className="basis-1/3">
           <Image
             className="rounded-full border-2 border-secondary p-5 min-w-52"
-            src="/profile_pic.jpg"
-            alt="Picture of the author"
+            src={avatarUrl}
+            alt={profile?.avatar?.alt || "Picture of the author"}
             width={300}
             height={300}
             priority
@@ -76,59 +144,30 @@ export default function Home() {
       <div className="flex flex-col my-5 px-10 text-center
                       lg:px-20 lg:text-left
                       2xl:px-32">
-
-        <div className="mt-5">
-          <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
-                        lg:text-3xl
-                        2xl:text-4xl">
-            <span className="text-secondary">Software Engineer</span> @ MES Innovation Sdn Bhd
-          </p>
-          <p className="text-unhighlighted text-sm font-[family-name:var(--font-titillium-web-light)]
-                        xl:text-xl">July 2025 - May 2026</p>
-          <ul className="text-lg text-justify leading-relaxed list-disc px-10 my-5 font-[family-name:var(--font-titillium-web-regular)]
-                         md:text-xl
-                         xl:text-2xl
-                         2xl:leading-9">
-            <li>Debug and resolve software issues in a fast-paced development environment.</li>
-            <li>Implement new features and improvements to existing software applications.</li>
-            <li>Manages CI/CD pipelines for automated testing and deployment.</li>
-          </ul>
-        </div>
-
-        <div className="mt-5">
-          <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
-                        lg:text-3xl
-                        2xl:text-4xl">
-            Part time <span className="text-secondary">Research and Development Engineer</span> @ Assassins Robotics
-          </p>
-          <p className="text-unhighlighted text-sm font-[family-name:var(--font-titillium-web-light)]
-                        xl:text-xl">January 2019 - Present</p>
-          <ul className="text-lg text-justify leading-relaxed list-disc px-10 my-5 font-[family-name:var(--font-titillium-web-regular)]
-                         md:text-xl
-                         xl:text-2xl
-                         2xl:leading-9">
-            <li>Research and develop advanced robotics toolkits and algorithms with Python.</li>
-            <li>Teaches students aged 7 to 15 about concepts in robotics and programming.</li>
-            <li>Prepares students for tournaments, this includes brainstorming ideas, extensive testing on the robot, preparing test logs, and presentation practices.</li>
-          </ul>
-        </div>
-
-        <div className="mt-5">
-          <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
-                        lg:text-3xl
-                        2xl:text-4xl">
-            <span className="text-secondary">Software Engineer Intern</span> @ CodeTrace Sdn Bhd
-          </p>
-          <p className="text-unhighlighted text-sm font-[family-name:var(--font-titillium-web-light)]
-                        xl:text-xl">March 2023 - August 2023</p>
-          <ul className="text-lg text-justify leading-relaxed list-disc px-10 my-5 font-[family-name:var(--font-titillium-web-regular)]
-                         md:text-xl
-                         xl:text-2xl
-                         2xl:leading-9">
-            <li>Developed and shipped an automated PDF data extraction software using ReactJS and Python. Wrapped into a desktop application using ElectronJS.</li>
-            <li>Built and hosted an inventory management system with ReactJS combined with Tailwind CSS connected to a Firebase backend.</li>
-          </ul>
-        </div>
+        {experiences.map((item) => (
+          <div key={item._id} className="mt-5">
+            <p className="text-2xl font-[family-name:var(--font-titillium-web-semi-bold)]
+                          lg:text-3xl
+                          2xl:text-4xl">
+              {item.employmentType && item.employmentType !== "Full-time" && (
+                <span>{item.employmentType} </span>
+              )}
+              <span className="text-secondary">{item.jobTitle}</span> @ {item.company}
+            </p>
+            <p className="text-unhighlighted text-sm font-[family-name:var(--font-titillium-web-light)]
+                          xl:text-xl">
+              {item.startDate} - {item.isCurrent ? "Present" : item.endDate || "Present"}
+            </p>
+            <ul className="text-lg text-justify leading-relaxed list-disc px-10 my-5 font-[family-name:var(--font-titillium-web-regular)]
+                           md:text-xl
+                           xl:text-2xl
+                           2xl:leading-9">
+              {item.bulletPoints?.map((bullet, idx) => (
+                <li key={idx}>{bullet}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
 
       {/* Projects section */}
@@ -138,101 +177,62 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-10 p-10 place-items-center
                       lg:px-20 lg:grid-cols-2
                       2xl:grid-cols-3">
-        
-        <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px]">
-          <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px] grid grid-cols-1 grid-rows-1 items-end">
-            <Image 
-              src="/verbalex.png" 
-              alt="VerbaLex Thumbnail" 
-              width={542} 
-              height={365} 
-              priority
-              className="rounded-3xl col-start-1 row-start-1"
-            />
-            <div className="bg-white/50 backdrop-blur-[2px] col-start-1 row-start-1 rounded-b-3xl flex flex-row items-center px-10 py-2 gap-10 text-sm
-                            md:text-md">
-              <div className="place-items-center">
-                <RiFlutterFill className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Flutter</p>
-              </div>
-              <div className="place-items-center">
-                <SiHuggingface className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Huggingface</p>
-              </div>
-              <div className="place-items-center">
-                <SiPython className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Python</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row place-items-center justify-between">
-            <p className="pt-4 text-4xl font-[family-name:var(--font-titillium-web-semi-bold)]">VerbaLex</p>
-            <Link href={"https://github.com/RitchieP/VerbaLex"} target="blank"><TbCircleArrowUpRight className="size-8 md:size-10 lg:size-9 xl:size-10 2xl:size-9"/></Link>
-          </div>
-          <p className="text-lg text-unhighlighted font-[family-name:var(--font-titillium-web-regular)]">Text-to-speech application to help transcribe accented speech.</p>
-        </div>
+        {projects.map((project) => {
+          const imageSrc = project.thumbnail
+            ? urlFor(project.thumbnail).width(542).height(365).url()
+            : project.thumbnailSrc || "/verbalex.png";
 
-        <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px]">
-          <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px] grid grid-cols-1 grid-rows-1 items-end">
-            <Image 
-              src="/myrescue.png" 
-              alt="MyRescue Thumbnail" 
-              width={542} 
-              height={365} 
-              priority
-              className="rounded-3xl col-start-1 row-start-1"
-            />
-            <div className="bg-white/50 backdrop-blur-[2px] col-start-1 row-start-1 rounded-b-3xl flex flex-row items-center px-10 py-2 gap-10 text-sm">
-              <div className="place-items-center">
-                <RiFlutterFill className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Flutter</p>
+          return (
+            <div
+              key={project._id}
+              className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px]"
+            >
+              <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px] grid grid-cols-1 grid-rows-1 items-end">
+                <Image
+                  src={imageSrc}
+                  alt={project.thumbnail?.alt || `${project.title} Thumbnail`}
+                  width={542}
+                  height={365}
+                  priority
+                  className="rounded-3xl col-start-1 row-start-1 object-cover w-full h-auto"
+                />
+                {project.technologies && project.technologies.length > 0 && (
+                  <div
+                    className="bg-white/50 backdrop-blur-[2px] col-start-1 row-start-1 rounded-b-3xl flex flex-row items-center px-10 py-2 gap-10 text-sm
+                                md:text-md"
+                  >
+                    {project.technologies.map((tech, idx) => {
+                      const Icon = techIconMap[tech];
+                      return (
+                        <div key={idx} className="place-items-center">
+                          {Icon ? (
+                            <Icon className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5" />
+                          ) : (
+                            <span className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5 flex items-center justify-center font-bold text-xs">•</span>
+                          )}
+                          <p>{tech}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              <div className="place-items-center">
-                <SiFirebase className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Firebase</p>
+              <div className="flex flex-row place-items-center justify-between">
+                <p className="pt-4 text-4xl font-[family-name:var(--font-titillium-web-semi-bold)]">
+                  {project.title}
+                </p>
+                {project.projectUrl && (
+                  <Link href={project.projectUrl} target="_blank" rel="noopener noreferrer">
+                    <TbCircleArrowUpRight className="size-8 md:size-10 lg:size-9 xl:size-10 2xl:size-9" />
+                  </Link>
+                )}
               </div>
-              <div className="place-items-center">
-                <SiGooglemaps className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Google Maps API</p>
-              </div>
+              <p className="text-lg text-unhighlighted font-[family-name:var(--font-titillium-web-regular)]">
+                {project.description}
+              </p>
             </div>
-          </div>
-          <div className="flex flex-row place-items-center justify-between">
-            <p className="pt-4 text-4xl font-[family-name:var(--font-titillium-web-semi-bold)]">MyRescue</p>
-            <a href="https://github.com/RitchieP/my_rescue" target="blank"><TbCircleArrowUpRight className="size-8 md:size-10 lg:size-9 xl:size-10 2xl:size-9"/></a>
-          </div>
-          <p className="text-lg text-unhighlighted font-[family-name:var(--font-titillium-web-regular)]">Resource management system during a natural disaster.</p>
-        </div>
-
-        <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px]">
-          {/* TODO: Replace this with Image later */}
-          <div className="w-[360px] md:w-[480px] lg:w-[360px] xl:w-[480px] 2xl:w-[400px] grid grid-cols-1 grid-rows-1 items-end">
-            <Image 
-              src="/myusm.png" 
-              alt="MyUSM Thumbnail" 
-              width={542} 
-              height={365} 
-              priority
-              className="rounded-3xl col-start-1 row-start-1"
-            />
-            <div className="bg-white/50 backdrop-blur-[2px] col-start-1 row-start-1 rounded-b-3xl flex flex-row items-center px-10 py-2 gap-10 text-sm">
-              <div className="place-items-center">
-                <RiFlutterFill className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Flutter</p>
-              </div>
-              <div className="place-items-center">
-                <SiFirebase className="h-5 w-5 md:h-8 md:w-8 lg:h-5 lg:w-5"/>
-                <p>Firebase</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row place-items-center justify-between">
-            <p className="pt-4 text-4xl font-[family-name:var(--font-titillium-web-semi-bold)]">MyUSM</p>
-            <a href="https://github.com/GDSC-USM/MyUSM" target="blank"><TbCircleArrowUpRight className="size-8 md:size-10 lg:size-9 xl:size-10 2xl:size-9"/></a>
-          </div>
-          <p className="text-lg text-unhighlighted font-[family-name:var(--font-titillium-web-regular)]">Centralized information system for all individuals associated with Universiti Sains Malaysia.</p>
-        </div>
-
+          );
+        })}
       </div>
 
       {/* Skills section */}
@@ -243,44 +243,16 @@ export default function Home() {
                       md:grid md:grid-cols-2 text-3xl font-[family-name:var(--font-titillium-web-bold)]
                       lg:px-20 lg:flex lg:flex-row lg:justify-between lg:place-items-start lg:text-left
                       2xl:px-32 2xl:text-4xl">
-        <div>
-          <p>Frontend</p>
-          <ul className="mt-4 text-3xl font-[family-name:var(--font-titillium-web-regular)]">
-            <li>ReactJS</li>
-            <li>Tailwind CSS</li>
-            <li>Flutter</li>
-          </ul>
-        </div>
-
-        <div>
-          <p>Backend</p>
-          <ul className="mt-4 text-3xl font-[family-name:var(--font-titillium-web-regular)]">
-            <li>NodeJS</li>
-            <li>MongoDB</li>
-            <li>Express</li>
-            <li>Firebase</li>
-          </ul>
-        </div>
-
-        <div>
-          <p>Soft Skills</p>
-          <ul className="mt-4 text-3xl font-[family-name:var(--font-titillium-web-regular)]">
-            <li>Collaboration</li>
-            <li>Effective Communication</li>
-            <li>Leadership</li>
-            <li>Analytical Thinking</li>
-          </ul>
-        </div>
-
-        <div>
-          <p>Others</p>
-          <ul className="mt-4 text-3xl font-[family-name:var(--font-titillium-web-regular)]">
-            <li>Python</li>
-            <li>ElectronJS</li>
-            <li>Google Cloud Services</li>
-          </ul>
-        </div>
-
+        {skillCategories.map((cat) => (
+          <div key={cat._id}>
+            <p>{cat.title}</p>
+            <ul className="mt-4 text-3xl font-[family-name:var(--font-titillium-web-regular)]">
+              {cat.skills?.map((skill, idx) => (
+                <li key={idx}>{skill}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
 
       {/* About me section */}
@@ -321,10 +293,10 @@ export default function Home() {
                      md:col-start-3 md:text-lg
                      lg:col-start-1 lg:col-span-2 lg:text-xl
                      2xl:col-span-1"
-          href="mailto:ritchiepoh@gmail.com"
+          href={`mailto:${email}`}
           target="_blank"
         >
-          Let's Chat! <FaRegPaperPlane color="white"/> 
+          Let&apos;s Chat! <FaRegPaperPlane color="white"/> 
         </a>
       </div>
     </div>
