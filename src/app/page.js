@@ -12,7 +12,7 @@ import {
   SKILL_CATEGORIES_QUERY,
 } from "@/sanity/queries";
 import {
-  techIconMap,
+  getTechIcon,
   fallbackExperiences,
   fallbackProjects,
   fallbackSkillCategories,
@@ -202,7 +202,7 @@ export default async function Home() {
                                 md:text-md"
                   >
                     {project.technologies.map((tech, idx) => {
-                      const Icon = techIconMap[tech];
+                      const Icon = getTechIcon(tech);
                       return (
                         <div key={idx} className="place-items-center">
                           {Icon ? (

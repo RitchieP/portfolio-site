@@ -1,33 +1,159 @@
 import { RiFlutterFill } from "react-icons/ri";
 import {
-  SiHuggingface,
-  SiPython,
-  SiFirebase,
+  SiDart,
   SiGooglemaps,
+  SiPython,
+  SiHuggingface,
+  SiFirebase,
   SiReact,
   SiTailwindcss,
   SiNodedotjs,
   SiMongodb,
   SiExpress,
   SiElectron,
+  SiTypescript,
+  SiJavascript,
+  SiNextdotjs,
+  SiPytorch,
+  SiTensorflow,
+  SiOpencv,
+  SiDocker,
+  SiPostgresql,
+  SiMysql,
+  SiSqlite,
+  SiSupabase,
+  SiGraphql,
+  SiPrisma,
+  SiGit,
+  SiGithub,
+  SiLinux,
+  SiAndroid,
+  SiApple,
+  SiSwift,
+  SiKotlin,
+  SiCplusplus,
+  SiC,
+  SiFastapi,
+  SiPostman,
+  SiFigma,
+  SiVercel,
 } from "react-icons/si";
+import { TbBrandOpenai, TbBrandCSharp } from "react-icons/tb";
 
+// Raw mapping for direct lookups
 export const techIconMap = {
+  // Mobile & Cross-platform
   Flutter: RiFlutterFill,
-  Huggingface: SiHuggingface,
+  Dart: SiDart,
+  Android: SiAndroid,
+  iOS: SiApple,
+  Apple: SiApple,
+  Swift: SiSwift,
+  Kotlin: SiKotlin,
+
+  // Languages
   Python: SiPython,
-  Firebase: SiFirebase,
-  "Google Maps API": SiGooglemaps,
+  JavaScript: SiJavascript,
+  TypeScript: SiTypescript,
+  "C++": SiCplusplus,
+  C: SiC,
+  "C#": TbBrandCSharp,
+
+  // Frontend & Styling
   React: SiReact,
   ReactJS: SiReact,
+  "Next.js": SiNextdotjs,
+  NextJS: SiNextdotjs,
   "Tailwind CSS": SiTailwindcss,
   Tailwind: SiTailwindcss,
+
+  // Backend & Databases
   NodeJS: SiNodedotjs,
   "Node.js": SiNodedotjs,
-  MongoDB: SiMongodb,
   Express: SiExpress,
+  FastAPI: SiFastapi,
+  Firebase: SiFirebase,
+  Supabase: SiSupabase,
+  MongoDB: SiMongodb,
+  PostgreSQL: SiPostgresql,
+  Postgres: SiPostgresql,
+  MySQL: SiMysql,
+  SQLite: SiSqlite,
+  GraphQL: SiGraphql,
+  Prisma: SiPrisma,
+
+  // AI & Data Science
+  Huggingface: SiHuggingface,
+  "Hugging Face": SiHuggingface,
+  PyTorch: SiPytorch,
+  TensorFlow: SiTensorflow,
+  OpenCV: SiOpencv,
+  OpenAI: TbBrandOpenai,
+
+  // APIs, Tools & Platforms
+  "Google Maps": SiGooglemaps,
+  "Google Maps API": SiGooglemaps,
+  Docker: SiDocker,
+  Electron: SiElectron,
   ElectronJS: SiElectron,
+  Git: SiGit,
+  GitHub: SiGithub,
+  Linux: SiLinux,
+  Postman: SiPostman,
+  Figma: SiFigma,
+  Vercel: SiVercel,
 };
+
+// Normalized lookup for case-insensitive and flexible matching
+const normalizedMap = Object.entries(techIconMap).reduce((acc, [key, icon]) => {
+  const normalized = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+  acc[normalized] = icon;
+  return acc;
+}, {});
+
+// Specific aliases for common variations
+normalizedMap["dart"] = SiDart;
+normalizedMap["flutter"] = RiFlutterFill;
+normalizedMap["googlemaps"] = SiGooglemaps;
+normalizedMap["googlemapsapi"] = SiGooglemaps;
+normalizedMap["maps"] = SiGooglemaps;
+normalizedMap["gmaps"] = SiGooglemaps;
+normalizedMap["next"] = SiNextdotjs;
+normalizedMap["nextjs"] = SiNextdotjs;
+normalizedMap["react"] = SiReact;
+normalizedMap["reactjs"] = SiReact;
+normalizedMap["tailwind"] = SiTailwindcss;
+normalizedMap["tailwindcss"] = SiTailwindcss;
+normalizedMap["node"] = SiNodedotjs;
+normalizedMap["nodejs"] = SiNodedotjs;
+normalizedMap["mongo"] = SiMongodb;
+normalizedMap["mongodb"] = SiMongodb;
+normalizedMap["express"] = SiExpress;
+normalizedMap["expressjs"] = SiExpress;
+normalizedMap["electron"] = SiElectron;
+normalizedMap["electronjs"] = SiElectron;
+normalizedMap["hf"] = SiHuggingface;
+normalizedMap["huggingface"] = SiHuggingface;
+normalizedMap["postgres"] = SiPostgresql;
+normalizedMap["postgresql"] = SiPostgresql;
+normalizedMap["cpp"] = SiCplusplus;
+normalizedMap["cplusplus"] = SiCplusplus;
+normalizedMap["csharp"] = TbBrandCSharp;
+normalizedMap["cs"] = TbBrandCSharp;
+normalizedMap["ts"] = SiTypescript;
+normalizedMap["js"] = SiJavascript;
+normalizedMap["py"] = SiPython;
+
+/**
+ * Returns the corresponding React Icon component for a given technology name.
+ * Uses case-insensitive, punctuation-stripped matching.
+ */
+export function getTechIcon(techName) {
+  if (!techName || typeof techName !== "string") return null;
+  if (techIconMap[techName]) return techIconMap[techName];
+  const cleaned = techName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return normalizedMap[cleaned] || null;
+}
 
 export const fallbackExperiences = [
   {
